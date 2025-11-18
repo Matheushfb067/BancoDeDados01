@@ -1,3 +1,8 @@
+DROP DATABASE IF EXISTS biblioteca;
+CREATE DATABASE biblioteca;
+
+USE biblioteca;
+
 CREATE TABLE Usuario(
     id_usuario INT,
     nome VARCHAR(45),
@@ -13,7 +18,7 @@ CREATE TABLE Autor(
     nome_autor VARCHAR(45),
     nascionalidade VARCHAR(45),
 
-    primary key (id_autor)
+    PRIMARY KEY (id_autor)
 );
 
 CREATE TABLE Livro(
@@ -21,7 +26,7 @@ CREATE TABLE Livro(
     titulo VARCHAR(45),
     ano INT,
 
-    primary key (id_livro)
+    PRIMARY KEY (id_livro)
 );
 
 CREATE TABLE Autor_has_Livro(
@@ -39,48 +44,44 @@ CREATE TABLE Categoria(
     nomeCategoria VARCHAR(45),
     descricao TEXT,
 
-    primary key (livro_usuario)
- );
+    PRIMARY KEY (livro_usuario)
+);
 
 CREATE TABLE Emprestimo(
     id_emprestimo INT,
     id_usuario INT,
     dataEmprestimo DATE,
     dataDevolucao DATE,
-    status BIT, --Entregue ou não entregue
+    status BIT, -- Entregue ou não entregue
 
-    primary key (id_emprestimo, id_usuario)
+    PRIMARY KEY (id_emprestimo, id_usuario),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
-INSERT INTO Usuario
-values
-(1, "Matheus", "matheus@inatel.br", "(95) 9875-4521", "03/08/2025"),
-(2, "Solange", "sol@inatel.br", "(22) 7954-6344", "16/12/2023"),
-(3, "Warley", "warley@inatel.br", "(67) 5347-7733", "22/06/2020");
+INSERT INTO Usuario VALUES
+(1, 'Matheus', 'matheus@inatel.br', '(95) 9875-4521', '2025-08-03'),
+(2, 'Solange', 'sol@inatel.br', '(22) 7954-6344', '2023-12-16'),
+(3, 'Warley', 'warley@inatel.br', '(67) 5347-7733', '2020-06-22');
 
-INSERT INTO Autor
-values
-(1, "Edgar Allan Poe", "Estados Unidos"),
-(2, "Machado de Assis", "Brasil"),
-(3, "Monteiro Lobato", "Brasil");
+INSERT INTO Autor VALUES
+(1, 'Edgar Allan Poe', 'Estados Unidos'),
+(2, 'Machado de Assis', 'Brasil'),
+(3, 'Monteiro Lobato', 'Brasil');
 
-INSERT INTO Livro
-values
-(84, "O Gato Preto", 1843),
-(26, "Memorias Postumas de Brás Cubas", 1881),
-(44, "Reinações de Narizinho", "1931");
+INSERT INTO Livro VALUES
+(84, 'O Gato Preto', 1843),
+(26, 'Memorias Postumas de Brás Cubas', 1881),
+(44, 'Reinações de Narizinho', 1931);
 
-INSERT INTO Categoria
-values
-("O Gato Preto", "Terror", "Um conto sombrio de Edgar Allan Poe que explora a loucura, a culpa e o peso da consciência humana."),
-("Memorias Postumas de Brás Cubas", "Romance", "Uma narrativa irônica e filosófica em que um defunto narra sua própria vida e critica a sociedade do século XIX."),
-("Reinações de Narizinho", "Infanto-juvenil", "Uma encantadora história infantil de Monteiro Lobato que mistura fantasia, imaginação e personagens do Sítio do Picapau Amarelo.");
+INSERT INTO Categoria VALUES
+('O Gato Preto', 'Terror', 'Um conto sombrio de Edgar Allan Poe que explora a loucura, a culpa e o peso da consciência humana.'),
+('Memorias Postumas de Brás Cubas', 'Romance', 'Uma narrativa irônica e filosófica em que um defunto narra sua própria vida e critica a sociedade do século XIX.'),
+('Reinações de Narizinho', 'Infanto-juvenil', 'Uma encantadora história infantil de Monteiro Lobato que mistura fantasia, imaginação e personagens do Sítio do Picapau Amarelo.');
 
-INSERT INTO Emprestimo
-values
-(12, 1, "03/09/2025", "03/10/2025", 1),
-(25, 2, "01/01/2024", "01/02/2024", 0),
-(66, 3, "23/10/2021", "23/11/2025", 0);
+INSERT INTO Emprestimo VALUES
+(12, 1, '2025-09-03', '2025-10-03', 1),
+(25, 2, '2024-01-01', '2024-02-01', 0),
+(66, 3, '2021-10-23', '2025-11-23', 0);
 
 -- Atualizar o e-mail de um usuário
 UPDATE Usuario
@@ -94,11 +95,11 @@ WHERE id_emprestimo = 25 AND id_usuario = 2;
 
 -- Deletar um livro (exemplo de remoção total)
 DELETE FROM Livro
-WHERE id_livro = 84; -- “O Gato Preto”
+WHERE id_livro = 84; -- "O Gato Preto"
 
---  Deletar um autor (exemplo de exclusão completa)
+-- Deletar um autor (exemplo de exclusão completa)
 DELETE FROM Autor
-WHERE id_autor = 3; -- “Monteiro Lobato”
+WHERE id_autor = 3; -- "Monteiro Lobato"
 
 ALTER TABLE Usuario
 ADD cpf VARCHAR(14);
@@ -108,11 +109,12 @@ DROP TABLE Autor_has_Livro;
 -- Criar um novo usuário
 -- Conceder privilégios para o usuário
 -- Atualiza imediatamente os privilégios
+DROP USER IF EXISTS 'bibliotecario'@'localhost';
 CREATE USER 'bibliotecario'@'localhost' IDENTIFIED BY 'senha123';
 GRANT ALL PRIVILEGES ON *.* TO 'bibliotecario'@'localhost';
 FLUSH PRIVILEGES;
 
---Function: calculando o total de emprestimos
+-- Function: calculando o total de emprestimos
 DELIMITER //
 CREATE FUNCTION totalEmprestimos(id INT)
 RETURNS INT
@@ -142,7 +144,7 @@ BEGIN
     VALUES (p_id_livro, p_titulo, p_ano);
 
     INSERT INTO Categoria (livro_usuario, nomeCategoria, descricao)
-    VALUES (p_id_livro, p_nomeCategoria, p_descricao);
+    VALUES (p_titulo, p_nomeCategoria, p_descricao);
 END //
 DELIMITER ;
 
